@@ -50,6 +50,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    @Transactional
     public DepartmentResponse getDepartmentById(UUID id) {
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
@@ -92,6 +93,11 @@ public class DepartmentServiceImpl implements DepartmentService {
     public void deleteDepartment(UUID id) {
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid department id: " + id));
+
+        if (!department.getEmployees().isEmpty()) {
+            throw new InvalidOperationException("Cannot delete department with employees");
+        }
+
         departmentRepository.delete(department);
     }
 }

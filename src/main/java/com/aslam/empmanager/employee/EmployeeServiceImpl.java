@@ -1,5 +1,7 @@
 package com.aslam.empmanager.employee;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.aslam.empmanager.department.Department;
@@ -47,6 +49,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         employeeRepository.save(employee);
         return employeeMapper.toResponse(employee);
+    }
+
+    @Override
+    public Page<EmployeeResponse> getAllEmployees(int page, int size) {
+        Page<Employee> employees = employeeRepository.findAll(PageRequest.of(page, size));
+        return employees.map(employeeMapper::toResponse);
     }
 
 }
