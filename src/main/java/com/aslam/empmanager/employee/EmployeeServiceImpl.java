@@ -90,6 +90,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // update reporting manager
         if (!request.getManagerId().equals(employee.getManager().getId())) {
+            // ensure user is not assigned to themselves.
+            if (request.getManagerId().equals(employee.getId()))
+                throw new InvalidOperationException("Cannot change manager to self");
+
             Employee manager = employeeRepository.findById(request.getManagerId())
                     .orElseThrow(() -> new InvalidOperationException("Invalid manager id: " + request.getManagerId()));
 

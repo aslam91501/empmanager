@@ -70,6 +70,14 @@ public class DepartmentServiceImpl implements DepartmentService {
         Department department = departmentRepository.findById(request.getId())
                 .orElseThrow(() -> new InvalidOperationException("Invalid department id: " + request.getId()));
 
+        department.setName(request.getName());
+
+        // Set Department Creation Date
+        // Ensure it is not null
+        department.setCreationDate(
+                request.getCreationDate() == null ? department.getCreationDate() : request.getCreationDate());
+
+        // Handle changing the department head
         if (request.getDepartmentHeadId() != null
                 && !request.getDepartmentHeadId().equals(department.getDepartmentHead().getId())) {
             Employee departmentHead = employeeRepository.findById(request.getDepartmentHeadId())
@@ -77,12 +85,6 @@ public class DepartmentServiceImpl implements DepartmentService {
                             "Employee not found with id: " + request.getDepartmentHeadId()));
             department.setDepartmentHead(departmentHead);
         }
-
-        if (request.getName() != null)
-            department.setName(request.getName());
-
-        if (request.getCreationDate() != null)
-            department.setCreationDate(request.getCreationDate());
 
         departmentRepository.save(department);
         return departmentMapper.toResponse(department);
@@ -94,6 +96,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Invalid department id: " + id));
 
+        // Cannot delete department with employees
         if (!department.getEmployees().isEmpty()) {
             throw new InvalidOperationException("Cannot delete department with employees");
         }
