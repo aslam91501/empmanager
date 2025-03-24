@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.aslam.empmanager.department.dto.DepartmentCreateRequest;
@@ -54,11 +56,10 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public List<DepartmentResponse> getAllDepartments() {
-        List<Department> departments = departmentRepository.findAll();
-        return departments.stream()
-                .map(departmentMapper::toResponse)
-                .collect(Collectors.toList());
+    public Page<DepartmentResponse> getAllDepartments(int page, int size) {
+        Page<Department> departments = departmentRepository.findAll(PageRequest.of(page, size));
+
+        return departments.map(departmentMapper::toResponse);
     }
 
     @Override
