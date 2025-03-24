@@ -31,10 +31,10 @@ public class DepartmentController {
 
     @GetMapping
     public ResponseEntity<Page<DepartmentResponse>> getAllDepartments(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
 
-        Page<DepartmentResponse> response = departmentService.getAllDepartments(page, size);
+        Page<DepartmentResponse> response = departmentService.getAllDepartments(page - 1, size);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
