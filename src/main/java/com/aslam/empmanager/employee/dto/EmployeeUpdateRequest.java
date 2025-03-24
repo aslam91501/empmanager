@@ -16,4 +16,5 @@ public class EmployeeUpdateRequest {
     private AddressDto address;
     private String title;
     private float bonusPercentage;
+    private UUID managerId;
 }
