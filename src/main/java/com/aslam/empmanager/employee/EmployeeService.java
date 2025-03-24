@@ -1,5 +1,7 @@
 package com.aslam.empmanager.employee;
 
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 
 import com.aslam.empmanager.employee.dto.EmployeeCreateRequest;
@@ -12,4 +14,6 @@ public interface EmployeeService {
     Page<EmployeeResponse> getAllEmployees(int page, int size);
 
     EmployeeResponse updateEmployee(EmployeeUpdateRequest request);
+
+    void deleteEmployee(UUID id);
 }

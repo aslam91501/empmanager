@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -31,10 +32,10 @@ public class Department {
     @Setter
     private LocalDate creationDate;
 
-    @OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "department", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Employee> employees;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @Setter
     private Employee departmentHead;
 

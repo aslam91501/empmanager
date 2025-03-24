@@ -14,4 +14,6 @@ public class EmployeeResponse {
     private LocalDate joinDate;
     private String title;
     private float bonusPercentage;
+
+    private EmployeeResponse manager;
 }

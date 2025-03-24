@@ -1,5 +1,7 @@
 package com.aslam.empmanager.employee;
 
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -34,19 +36,33 @@ public class EmployeeServiceImpl implements EmployeeService {
                 request.getTitle(),
                 request.getBonusPercentage());
 
-        if (request.getDepartmentId() != null) {
-            Department department = departmentRepository.findById(request.getDepartmentId())
-                    .orElseThrow(
-                            () -> new InvalidOperationException("Invalid department id: " + request.getDepartmentId()));
-
-            employee.setDepartment(department);
-
-            if (department.getDepartmentHead() != null)
-                employee.setManager(department.getDepartmentHead());
-        }
-
+        // Set join date if provided (in case it differs from current date)
         if (request.getJoinDate() != null)
             employee.setJoinDate(request.getJoinDate());
+
+        // Get department
+        Department department = departmentRepository.findById(request.getDepartmentId())
+                .orElseThrow(
+                        () -> new InvalidOperationException("Invalid department id: " + request.getDepartmentId()));
+
+        // assign department.
+        employee.setDepartment(department);
+
+        // Company head can't report to any manager
+        if (request.getManagerId() == null && !request.isCompanyHead()) {
+            throw new InvalidOperationException("Must have a reporting manager unless you are the company head");
+        }
+
+        if (request.isCompanyHead()) {
+            // mark employee as company head
+            employee.setCompanyHead(true);
+        } else {
+            // if employee isn't the company head, they must have a reporting manager
+            Employee manager = employeeRepository.findById(request.getManagerId())
+                    .orElseThrow(() -> new InvalidOperationException("Invalid manager id: " + request.getManagerId()));
+
+            employee.setManager(manager);
+        }
 
         employeeRepository.save(employee);
         return employeeMapper.toResponse(employee);
@@ -59,26 +75,23 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional
     public EmployeeResponse updateEmployee(EmployeeUpdateRequest request) {
         Employee employee = employeeRepository.findById(request.getId())
                 .orElseThrow(() -> new InvalidOperationException("Invalid employee id: " + request.getId()));
 
-        if (request.getName() != null)
-            employee.setName(request.getName());
-        if (request.getDob() != null)
-            employee.setDob(request.getDob());
-        if (request.getSalary() != 0)
-            employee.setSalary(request.getSalary());
-        if (request.getAddress() != null)
-            employee.setAddress(employeeMapper.toAddress(request.getAddress()));
-        if (request.getTitle() != null)
-            employee.setTitle(request.getTitle());
-        if (request.getBonusPercentage() != 0)
-            employee.setBonusPercentage(request.getBonusPercentage());
+        employee.setName(request.getName());
+        employee.setDob(request.getDob());
+        employee.setSalary(request.getSalary());
+        employee.setAddress(employeeMapper.toAddress(request.getAddress()));
+        employee.setTitle(request.getTitle());
+        employee.setBonusPercentage(request.getBonusPercentage());
 
-        if (request.getManagerId() != null) {
+        // update reporting manager
+        if (!request.getManagerId().equals(employee.getManager().getId())) {
             Employee manager = employeeRepository.findById(request.getManagerId())
                     .orElseThrow(() -> new InvalidOperationException("Invalid manager id: " + request.getManagerId()));
+
             employee.setManager(manager);
         }
 
@@ -86,4 +99,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeMapper.toResponse(employee);
     }
 
+    @Override
+    @Transactional
+    public void deleteEmployee(UUID id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new InvalidOperationException("Invalid employee id: " + id));
+
+        if (employee.isCompanyHead())
+            throw new InvalidOperationException("Cannot delete company head");
+
+        employeeRepository.delete(employee);
+    }
 }

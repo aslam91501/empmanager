@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.persistence.CascadeType;
 import com.aslam.empmanager.department.Department;
 
 import jakarta.persistence.Embedded;
@@ -46,7 +47,7 @@ public class Employee {
     @Setter
     private float bonusPercentage;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @Setter
     private Employee manager;
 
@@ -56,6 +57,9 @@ public class Employee {
 
     @OneToMany(mappedBy = "manager")
     private List<Employee> subordinates;
+
+    @Setter
+    private boolean isCompanyHead = false;
 
     public Employee(String name, LocalDate dob, float salary, Address address, String title, float bonusPercentage) {
         this.id = UUID.randomUUID();
