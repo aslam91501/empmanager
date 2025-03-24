@@ -19,7 +19,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Department {
     @Id
@@ -31,14 +30,33 @@ public class Department {
     private List<Employee> employees;
 
     @OneToOne
+    @Setter
     private Employee departmentHead;
 
     public Department(String name, LocalDate creationDate, Employee departmentHead) {
         this.id = UUID.randomUUID();
         this.name = name;
-        this.creationDate = creationDate;
         this.departmentHead = departmentHead;
 
+        this.creationDate = verifyCreationDate(creationDate);
+
         this.employees = new ArrayList<>();
+    }
+
+    public Department(String name, LocalDate creationDate) {
+        this.id = UUID.randomUUID();
+        this.name = name;
+
+        this.creationDate = verifyCreationDate(creationDate);
+
+        this.employees = new ArrayList<>();
+    }
+
+    private LocalDate verifyCreationDate(LocalDate creationDate) {
+        if (creationDate != null) {
+            return creationDate;
+        } else {
+            return LocalDate.now();
+        }
     }
 }
