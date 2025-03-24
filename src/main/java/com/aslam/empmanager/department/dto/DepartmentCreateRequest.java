@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 public class DepartmentCreateRequest {
-    @NotBlank
+    @NotBlank(message = "name cannot be blank")
     private String name;
     private LocalDate creationDate;
     private UUID departmentHeadId;

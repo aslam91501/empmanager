@@ -8,8 +8,10 @@ import lombok.Data;
 
 @Data
 public class DepartmentUpdateRequest {
-    @NotBlank
+    @NotBlank(message = "id cannot be blank")
     private UUID id;
+
+    @NotBlank(message = "name cannot be blank")
     private String name;
     private LocalDate creationDate;
     private UUID departmentHeadId;

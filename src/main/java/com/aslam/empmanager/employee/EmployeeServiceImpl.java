@@ -80,6 +80,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeRepository.findById(request.getId())
                 .orElseThrow(() -> new InvalidOperationException("Invalid employee id: " + request.getId()));
 
+        // update employee fields
         employee.setName(request.getName());
         employee.setDob(request.getDob());
         employee.setSalary(request.getSalary());
