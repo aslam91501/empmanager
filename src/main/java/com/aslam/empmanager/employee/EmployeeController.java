@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aslam.empmanager.employee.dto.EmployeeCreateRequest;
+import com.aslam.empmanager.employee.dto.EmployeeDepartmentChangeRequest;
 import com.aslam.empmanager.employee.dto.EmployeeResponse;
 import com.aslam.empmanager.employee.dto.EmployeeUpdateRequest;
 
@@ -51,6 +52,12 @@ public class EmployeeController {
     public ResponseEntity<Void> deleteEmployee(@PathVariable UUID id) {
         employeeService.deleteEmployee(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("department")
+    public ResponseEntity<EmployeeResponse> changeEmployeeDepartment(
+            @Valid @RequestBody EmployeeDepartmentChangeRequest request) {
+        return new ResponseEntity<>(employeeService.changeEmployeeDepartment(request), HttpStatus.OK);
     }
 
 }

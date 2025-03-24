@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.aslam.empmanager.department.Department;
 import com.aslam.empmanager.department.DepartmentRepository;
 import com.aslam.empmanager.employee.dto.EmployeeCreateRequest;
+import com.aslam.empmanager.employee.dto.EmployeeDepartmentChangeRequest;
 import com.aslam.empmanager.employee.dto.EmployeeResponse;
 import com.aslam.empmanager.employee.dto.EmployeeUpdateRequest;
 import com.aslam.empmanager.exceptions.InvalidOperationException;
@@ -51,6 +52,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         // Company head can't report to any manager
         if (request.getManagerId() == null && !request.isCompanyHead()) {
             throw new InvalidOperationException("Must have a reporting manager unless you are the company head");
+        }
+
+        // ensure a second company head isn't created.
+        if (employeeRepository.existsByIsCompanyHeadTrue() && request.isCompanyHead()) {
+            throw new InvalidOperationException("Cannot create second company head");
         }
 
         if (request.isCompanyHead()) {
@@ -114,5 +120,19 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new InvalidOperationException("Cannot delete company head");
 
         employeeRepository.delete(employee);
+    }
+
+    @Override
+    public EmployeeResponse changeEmployeeDepartment(EmployeeDepartmentChangeRequest request) {
+        Employee employee = employeeRepository.findById(request.getEmployeeId())
+                .orElseThrow(() -> new InvalidOperationException("Invalid employee id: " + request.getEmployeeId()));
+
+        Department department = departmentRepository.findById(request.getDepartmentId())
+                .orElseThrow(
+                        () -> new InvalidOperationException("Invalid department id: " + request.getDepartmentId()));
+
+        employee.setDepartment(department);
+        employeeRepository.save(employee);
+        return employeeMapper.toResponse(employee);
     }
 }
