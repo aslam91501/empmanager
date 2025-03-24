@@ -7,8 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class DepartmentCreateRequest {
+public class DepartmentUpdateRequest {
     @NotBlank
+    private UUID id;
     private String name;
     private LocalDate creationDate;
     private UUID departmentHeadId;

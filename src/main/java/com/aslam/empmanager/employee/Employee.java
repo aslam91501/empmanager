@@ -19,25 +19,39 @@ import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Employee {
     @Id
     private UUID id;
+
+    @Setter
     private String name;
+
+    @Setter
     private LocalDate dob;
+
+    @Setter
     private float salary;
+
+    @Setter
     private LocalDate joinDate;
 
     @Embedded
+    @Setter
     private Address address;
+
+    @Setter
     private String title;
+
+    @Setter
     private float bonusPercentage;
 
     @ManyToOne
+    @Setter
     private Employee manager;
 
     @ManyToOne
+    @Setter
     private Department department;
 
     @OneToMany(mappedBy = "manager")

@@ -23,7 +23,11 @@ import lombok.NoArgsConstructor;
 public class Department {
     @Id
     private UUID id;
+
+    @Setter
     private String name;
+
+    @Setter
     private LocalDate creationDate;
 
     @OneToMany(mappedBy = "department")
