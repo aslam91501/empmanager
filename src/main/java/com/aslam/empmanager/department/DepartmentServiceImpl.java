@@ -13,6 +13,7 @@ import com.aslam.empmanager.department.dto.DepartmentResponse;
 import com.aslam.empmanager.department.dto.DepartmentUpdateRequest;
 import com.aslam.empmanager.employee.Employee;
 import com.aslam.empmanager.employee.EmployeeRepository;
+import com.aslam.empmanager.exceptions.InvalidOperationException;
 import com.aslam.empmanager.exceptions.ResourceNotFoundException;
 
 import jakarta.transaction.Transactional;
@@ -31,8 +32,8 @@ public class DepartmentServiceImpl implements DepartmentService {
         Department department;
         if (request.getDepartmentHeadId() != null) {
             Employee departmentHead = employeeRepository.findById(request.getDepartmentHeadId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Employee not found with id: " + request.getDepartmentHeadId()));
+                    .orElseThrow(() -> new InvalidOperationException(
+                            "Invalid department head id: " + request.getDepartmentHeadId()));
 
             department = new Department(
                     request.getName(),
@@ -66,7 +67,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Transactional
     public DepartmentResponse updateDepartment(DepartmentUpdateRequest request) {
         Department department = departmentRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + request.getId()));
+                .orElseThrow(() -> new InvalidOperationException("Invalid department id: " + request.getId()));
 
         if (request.getDepartmentHeadId() != null
                 && !request.getDepartmentHeadId().equals(department.getDepartmentHead().getId())) {
@@ -90,7 +91,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Transactional
     public void deleteDepartment(UUID id) {
         Department department = departmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid department id: " + id));
         departmentRepository.delete(department);
     }
 }
