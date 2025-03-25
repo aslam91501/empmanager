@@ -18,5 +18,7 @@ public interface EmployeeService {
 
     EmployeeResponse changeEmployeeDepartment(EmployeeDepartmentChangeRequest request);
 
+    EmployeeResponse getEmployee(UUID id, boolean lookup);
+
     void deleteEmployee(UUID id);
 }

@@ -48,6 +48,12 @@ public class EmployeeController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<EmployeeResponse> getEmployee(@PathVariable UUID id,
+            @RequestParam(defaultValue = "false") boolean lookup) {
+        return new ResponseEntity<>(employeeService.getEmployee(id, lookup), HttpStatus.OK);
+    }
+
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable UUID id) {
         employeeService.deleteEmployee(id);

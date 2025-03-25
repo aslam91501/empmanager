@@ -12,7 +12,11 @@ import com.aslam.empmanager.employee.dto.EmployeeCreateRequest;
 import com.aslam.empmanager.employee.dto.EmployeeDepartmentChangeRequest;
 import com.aslam.empmanager.employee.dto.EmployeeResponse;
 import com.aslam.empmanager.employee.dto.EmployeeUpdateRequest;
+import com.aslam.empmanager.employee.projections.EmployeeDetailView;
+import com.aslam.empmanager.employee.projections.EmployeeLookupView;
+import com.aslam.empmanager.employee.projections.EmployeeView;
 import com.aslam.empmanager.exceptions.InvalidOperationException;
+import com.aslam.empmanager.exceptions.ResourceNotFoundException;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -76,7 +80,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Page<EmployeeResponse> getAllEmployees(int page, int size) {
-        Page<Employee> employees = employeeRepository.findAll(PageRequest.of(page, size));
+        Page<EmployeeView> employees = employeeRepository.getAll(PageRequest.of(page, size));
         return employees.map(employeeMapper::toResponse);
     }
 
@@ -134,5 +138,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setDepartment(department);
         employeeRepository.save(employee);
         return employeeMapper.toResponse(employee);
+    }
+
+    @Override
+    public EmployeeResponse getEmployee(UUID id, boolean lookup) {
+        if (lookup) {
+            EmployeeLookupView employee = employeeRepository.employeeLookup(id).orElseThrow(
+                    () -> new ResourceNotFoundException("No employee found with id: " + id));
+            return employeeMapper.toResponse(employee);
+        } else {
+            EmployeeDetailView employee = employeeRepository.getEmployeeDetailed(id).orElseThrow(
+                    () -> new ResourceNotFoundException("No employee found with id: " + id));
+            return employeeMapper.toResponse(employee);
+        }
     }
 }
