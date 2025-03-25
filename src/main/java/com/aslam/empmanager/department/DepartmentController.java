@@ -57,8 +57,10 @@ public class DepartmentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DepartmentResponse> getDepartmentById(@PathVariable("id") UUID id) {
-        DepartmentResponse response = departmentService.getDepartmentById(id);
+    public ResponseEntity<DepartmentResponse> getDepartmentById(
+            @PathVariable("id") UUID id,
+            @RequestParam(defaultValue = "false") boolean expand) {
+        DepartmentResponse response = departmentService.getDepartmentById(id, expand);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

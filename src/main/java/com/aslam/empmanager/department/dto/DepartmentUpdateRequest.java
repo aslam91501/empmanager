@@ -4,11 +4,12 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class DepartmentUpdateRequest {
-    @NotBlank(message = "id cannot be blank")
+    @NotNull(message = "id cannot be null")
     private UUID id;
 
     @NotBlank(message = "name cannot be blank")

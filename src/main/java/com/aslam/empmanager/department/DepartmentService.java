@@ -11,7 +11,7 @@ import com.aslam.empmanager.department.dto.DepartmentUpdateRequest;
 public interface DepartmentService {
     DepartmentResponse createDepartment(DepartmentCreateRequest request);
 
-    DepartmentResponse getDepartmentById(UUID id);
+    DepartmentResponse getDepartmentById(UUID id, boolean expand);
 
     Page<DepartmentResponse> getAllDepartments(int page, int size);
 

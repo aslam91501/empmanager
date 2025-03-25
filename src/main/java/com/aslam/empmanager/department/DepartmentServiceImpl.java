@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import com.aslam.empmanager.department.dto.DepartmentCreateRequest;
 import com.aslam.empmanager.department.dto.DepartmentResponse;
 import com.aslam.empmanager.department.dto.DepartmentUpdateRequest;
+import com.aslam.empmanager.department.projections.DepartmentDetailView;
+import com.aslam.empmanager.department.projections.DepartmentView;
 import com.aslam.empmanager.employee.Employee;
 import com.aslam.empmanager.employee.EmployeeRepository;
 import com.aslam.empmanager.exceptions.InvalidOperationException;
@@ -51,15 +53,23 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional
-    public DepartmentResponse getDepartmentById(UUID id) {
-        Department department = departmentRepository.findById(id)
+    public DepartmentResponse getDepartmentById(UUID id, boolean expand) {
+        if (expand) {
+            DepartmentDetailView department = departmentRepository.getDepartmentDetailed(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
+
+            return departmentMapper.toResponse(department);
+        }
+
+        DepartmentView department = departmentRepository.getDepartment(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Department not found with id: " + id));
+
         return departmentMapper.toResponse(department);
     }
 
     @Override
     public Page<DepartmentResponse> getAllDepartments(int page, int size) {
-        Page<Department> departments = departmentRepository.findAll(PageRequest.of(page, size));
+        Page<DepartmentView> departments = departmentRepository.getAllDepartments(PageRequest.of(page, size));
 
         return departments.map(departmentMapper::toResponse);
     }
@@ -78,12 +88,14 @@ public class DepartmentServiceImpl implements DepartmentService {
                 request.getCreationDate() == null ? department.getCreationDate() : request.getCreationDate());
 
         // Handle changing the department head
-        if (request.getDepartmentHeadId() != null
-                && !request.getDepartmentHeadId().equals(department.getDepartmentHead().getId())) {
-            Employee departmentHead = employeeRepository.findById(request.getDepartmentHeadId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Employee not found with id: " + request.getDepartmentHeadId()));
-            department.setDepartmentHead(departmentHead);
+        if (request.getDepartmentHeadId() != null) {
+            if (department.getDepartmentHead() == null
+                    || !request.getDepartmentHeadId().equals(department.getDepartmentHead().getId())) {
+                Employee departmentHead = employeeRepository.findById(request.getDepartmentHeadId())
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "Employee not found with id: " + request.getDepartmentHeadId()));
+                department.setDepartmentHead(departmentHead);
+            }
         }
 
         departmentRepository.save(department);
@@ -103,4 +115,5 @@ public class DepartmentServiceImpl implements DepartmentService {
 
         departmentRepository.delete(department);
     }
+
 }
